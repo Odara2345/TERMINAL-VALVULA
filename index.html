@@ -2,18 +2,19 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Terminal Matrix CRT - SYSTEM CORRUPTION</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>Terminal Matrix CRT - MOBILE OPTIMIZED</title>
     <style>
         body {
             background-color: #010201;
             color: #00ff41;
             font-family: 'Courier New', Courier, monospace;
             margin: 0;
-            padding: 10px;
+            padding: 8px;
             box-sizing: border-box;
             height: 100vh;
             overflow: hidden;
+            -webkit-text-size-adjust: 100%; /* Evita bugs de texto no iOS */
         }
 
         /* Efeito agressivo de tremor e sangue na interface inteira ao errar */
@@ -25,9 +26,9 @@
         .terminal-box {
             border: 1px solid #1f2e1f;
             background: #050a05;
-            padding: 15px;
+            padding: 12px;
             box-shadow: inset 0 0 30px rgba(0,0,0,1);
-            max-width: 750px;
+            max-width: 500px; /* Otimizado para largura de celular */
             margin: 0 auto;
             height: 100%;
             display: flex;
@@ -39,11 +40,11 @@
         .crt-paper {
             background: #e1e8cc;
             color: #1c2618;
-            padding: 12px;
-            border-left: 8px dotted #a4ad8f;
-            border-right: 8px dotted #a4ad8f;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 6px dotted #a4ad8f;
+            border-right: 6px dotted #a4ad8f;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
             line-height: 1.4;
             font-weight: bold;
         }
@@ -58,9 +59,9 @@
             width: 100%;
             box-sizing: border-box;
             text-align: center;
-            letter-spacing: 8px;
+            letter-spacing: 6px;
             outline: none;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .btn-send {
@@ -73,7 +74,7 @@
             cursor: pointer;
             width: 100%;
             text-transform: uppercase;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
         .btn-send:hover { background: #ffffff; }
 
@@ -83,7 +84,7 @@
             flex: 1;
             border: 2px dashed #ff1a1a;
             background: #0a0101;
-            padding: 10px;
+            padding: 8px;
             box-sizing: border-box;
             height: 100%;
             overflow: hidden;
@@ -95,23 +96,23 @@
             text-align: center;
             border-bottom: 1px solid #ff1a1a;
             padding-bottom: 5px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             letter-spacing: 1px;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
         }
 
         #memory-stack {
             flex: 1;
             background: #000;
             border: 1px solid #220000;
-            padding: 8px;
+            padding: 6px;
             font-size: 0.8rem;
             color: #ff4444;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             overflow: hidden;
-            line-height: 1.4;
+            line-height: 1.3;
             margin-bottom: 5px;
         }
 
@@ -133,21 +134,38 @@
             background: rgba(12, 0, 0, 0.98);
             border: 4px double #ff0000;
             color: #ffffff;
-            padding: 30px 15px;
+            padding: 25px 12px;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             z-index: 999;
             box-sizing: border-box;
             box-shadow: 0 0 40px rgba(255, 0, 0, 0.7);
             letter-spacing: 1px;
-            line-height: 1.5;
+            line-height: 1.4;
             text-transform: uppercase;
         }
 
         /* ANIMAÇÃO PISCANTE PARA O ERRO COMPLETO (DERROTA) */
         .fatal-blink {
             animation: redWhiteBlink 0.2s infinite alternate;
+        }
+
+        .btn-restart-game {
+            background: #ff1a1a;
+            color: #000;
+            border: none;
+            padding: 15px 25px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 25px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(255, 26, 26, 0.6);
+        }
+        .btn-restart-game:hover {
+            background: #ffffff;
         }
 
         @keyframes redWhiteBlink {
@@ -165,11 +183,12 @@
         }
 
         .input-area-overflow {
-            margin-top: 10px;
+            margin-top: 5px;
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
+        /* IMPORTANTE: Font-size em 16px impede o zoom automático no Mobile */
         .input-overflow {
             flex: 1;
             background: transparent;
@@ -177,9 +196,9 @@
             color: #ff1a1a;
             padding: 12px;
             font-family: 'Courier New', monospace;
-            font-size: 1rem;
+            font-size: 16px; 
             outline: none;
-            min-width: 0; /* Impede que o input quebre o flexbox no mobile */
+            min-width: 0;
         }
         .input-overflow:disabled {
             background: #1a0000;
@@ -191,7 +210,7 @@
             background: #ff1a1a;
             color: #000;
             border: none;
-            padding: 12px 15px;
+            padding: 12px 14px;
             font-family: 'Courier New', monospace;
             font-weight: bold;
             cursor: pointer;
@@ -203,17 +222,15 @@
             cursor: not-allowed;
         }
 
-        /* Ajustes específicos para telas de computadores/tablets */
         @media (min-width: 768px) {
             body { padding: 20px; }
-            .terminal-box { height: 90vh; padding: 20px; }
+            .terminal-box { height: 90vh; padding: 20px; max-width: 750px; }
             .crt-paper { font-size: 0.95rem; border-left: 12px dotted #a4ad8f; border-right: 12px dotted #a4ad8f; }
             .input-code { letter-spacing: 10px; }
             .game-header { font-size: 1rem; letter-spacing: 2px; }
             #memory-stack { font-size: 0.9rem; padding: 10px; }
             #center-jumpscare-overlay { width: 85%; padding: 40px 20px; font-size: 1.4rem; }
             .btn-overflow { padding: 10px 20px; font-size: 1rem; }
-            .input-overflow { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -222,11 +239,11 @@
     <div id="main-box" class="terminal-box">
         <div id="center-jumpscare-overlay"></div>
 
-        <div style="font-size: 1rem; border-bottom: 2px solid #00ff41; padding-bottom: 5px; font-weight: bold; text-align: center;">
+        <div style="font-size: 0.9rem; border-bottom: 2px solid #00ff41; padding-bottom: 5px; font-weight: bold; text-align: center;">
             TERMINAL MATRICIAL DE CONTENÇÃO E RETORNO (C-404)
         </div>
         
-        <p id="status-line" style="color: #00ff41; font-weight: bold; margin-top:15px; font-size: 0.8rem; text-align: center;">
+        <p id="status-line" style="color: #00ff41; font-weight: bold; margin-top:12px; font-size: 0.75rem; text-align: center;">
             ZUMBIDO ELÉTRICO ATIVO (60 Hz) --- TELA DE FÓSFORO VERDE ESTÁVEL
         </p>
 
@@ -236,10 +253,10 @@
                 Para abrir a eclusa de retorno, a senha de 4 dígitos deve ser extraída dos quatro gaveteiros de contenção ao seu redor. A verdade está no que foi deixado aberto, mas o código é formado apenas pelo que permanece trancado.
             </div>
 
-            <p style="font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;">INSIRA A CHAVE DE 4 DÍGITOS PARA RECONEXÃO:</p>
+            <p style="font-weight: bold; margin-bottom: 5px; font-size: 0.85rem;">INSIRA A CHAVE DE 4 DÍGITOS PARA RECONEXÃO:</p>
             <input type="text" id="enigma-digits" class="input-code" maxlength="4" placeholder="XXXX" inputmode="numeric">
             <button class="btn-send" onclick="testarCodigoEnigma()">Injetar Sequência Decisiva.exe</button>
-            <div id="code-result-message" style="margin-top: 15px; font-weight: bold; font-size: 0.9rem;"></div>
+            <div id="code-result-message" style="margin-top: 15px; font-weight: bold; font-size: 0.85rem;"></div>
         </div>
 
         <div id="overflow-minigame">
@@ -247,9 +264,9 @@
                 [ALERTA DE SISTEMA] COMPROMETIMENTO AGUDO DAS SUBTRILHAS DE SINAL
             </div>
             
-            <p style="color: #ffaa00; font-size: 0.8rem; margin: 0 0 10px 0; text-align: center; line-height: 1.3;">
+            <p style="color: #ffaa00; font-size: 0.75rem; margin: 0 0 8px 0; text-align: center; line-height: 1.3;">
                 DIGITE A PALAVRA COAGULANTE PARA RETER O VAZAMENTO: <br>
-                <span id="target-word-display" style="color:#fff; font-size: 1.2rem; font-weight:bold; background: #500; padding: 2px 10px; display: inline-block; margin-top: 5px;">FLUSH</span>
+                <span id="target-word-display" style="color:#fff; font-size: 1.1rem; font-weight:bold; background: #500; padding: 2px 10px; display: inline-block; margin-top: 4px;">FLUSH</span>
             </p>
 
             <div id="memory-stack"></div>
@@ -367,16 +384,17 @@
             const stack = document.getElementById("memory-stack");
             const randomHex = () => Math.floor(Math.random()*16).toString(16).toUpperCase();
             
-            const fakeMemory = `0x00A${randomHex()} [SYSTEM_INFECTED] => OVERFLOW_DATA_${randomHex()}${randomHex()}`;
+            const fakeMemory = `0x00A${randomHex()} [SYSTEM_INFECTED] => OVERFLOW_${randomHex()}${randomHex()}`;
             
             currentLines.push(fakeMemory);
             renderizarPilha();
 
+            // CONDIÇÃO DE DERROTA OPERACIONAL
             if (currentLines.length > MAX_LINES) {
                 clearInterval(gameInterval);
                 clearTimeout(overlayTimeout);
                 
-                isPausedForMessage = false; 
+                isPausedForMessage = true; // Pausa permanentemente até reiniciar
 
                 const overlay = document.getElementById("center-jumpscare-overlay");
                 overlay.style.display = "block";
@@ -386,29 +404,20 @@
                 overlay.style.border = "none";
                 
                 overlay.innerHTML = `
-                    <div class="fatal-blink" style='margin-top: 60%; font-size: 1.3rem; letter-spacing: 1px; font-weight: 900; padding: 0 10px;'>
+                    <div class="fatal-blink" style='margin-top: 40%; font-size: 1.2rem; letter-spacing: 1px; font-weight: 900; padding: 0 15px;'>
                         [CRÍTICO: VOCÊ MATOU TODOS ELES...]<br><br>
                         " ELE ESTÁ VINDO, COMECE A REZAR. "
+                        <br>
+                        <button class="btn-restart-game" onclick="window.location.reload();">REINICIAR TERMINAL</button>
                     </div>
                 `;
 
-                // Adapta a posição do texto de derrota caso seja computador
                 if (window.innerWidth >= 768) {
-                    overlay.querySelector('.fatal-blink').style.marginTop = "30%";
+                    overlay.querySelector('.fatal-blink').style.marginTop = "25%";
                     overlay.querySelector('.fatal-blink').style.fontSize = "1.7rem";
                 }
 
                 document.getElementById("main-box").classList.add("screen-shake");
-
-                setTimeout(() => {
-                    document.getElementById("main-box").classList.remove("screen-shake");
-                    document.getElementById("overflow-minigame").style.display = "none";
-                    document.getElementById("code-entry-zone").style.display = "block";
-                    document.getElementById("status-line").style.color = "#00ff41";
-                    document.getElementById("status-line").innerText = "ZUMBIDO ELÉTRICO ATIVO (60 Hz) --- TELA DE FÓSFORO VERDE ESTÁVEL";
-                    document.getElementById("enigma-digits").value = "";
-                    document.getElementById("code-result-message").innerHTML = "<span style='color: #ff1a1a;'>[AVISO CATASTRÓFICO] O terminal reiniciou à força. Pegadas úmidas foram detectadas atrás da sua estação.</span>";
-                }, 5000); 
             }
         }
 
@@ -466,7 +475,7 @@
                 overlay.style.display = "block";
 
                 const randomHex = () => Math.floor(Math.random()*16).toString(16).toUpperCase();
-                currentLines.push(`0x00F${randomHex()} [ENTITY_FEEDBACK] => BLOCK_ERR`);
+                currentLines.push(`0x00F${randomHex()} [ENTITY_FEEDBACK] => ERR`);
                 renderizarPilha();
 
                 overlayTimeout = setTimeout(() => {
@@ -486,3 +495,17 @@
                     }
                 }, 3000);
             }
+            if (!isPausedForMessage) {
+                inputEl.value = "";
+            }
+        }
+
+        document.getElementById("enigma-digits").addEventListener("keyup", function(event) {
+            if (event.key === "Enter") { testarCodigoEnigma(); }
+        });
+        document.getElementById("overflow-input").addEventListener("keyup", function(event) {
+            if (event.key === "Enter") { processarComandoOverflow(); }
+        });
+    </script>
+</body>
+</html>
