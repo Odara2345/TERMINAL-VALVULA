@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>Terminal Matrix CRT - MOBILE PERFECT</title>
+    <title>Terminal Matrix CRT - MOBILE POLISHED</title>
     <style>
         body {
             background-color: #010201;
@@ -77,7 +77,6 @@
             font-size: 0.95rem;
         }
 
-        /* --- NOVO DESIGN DO MINIGAME MOBILE (SEM TECLADO) --- */
         #overflow-minigame {
             display: none;
             flex-direction: column;
@@ -100,7 +99,6 @@
             font-size: 0.75rem;
         }
 
-        /* Barra de perigo/estabilidade */
         .progress-container {
             background: #220000;
             border: 1px solid #ff1a1a;
@@ -115,7 +113,6 @@
             transition: width 0.2s linear;
         }
 
-        /* Grid de botões para clicar no celular */
         .matrix-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -129,25 +126,27 @@
             border: 1px solid #550000;
             color: #ff4444;
             font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             cursor: pointer;
             text-align: center;
-            padding: 10px;
+            padding: 15px 10px;
             border-radius: 4px;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background 0.1s ease;
         }
+        
+        /* O alvo correto tem um destaque sutil de cor, mas as palavras parecidas confundem */
         .grid-node.target-node {
-            border-color: #ff1a1a;
-            background: #3a0000;
-            color: #fff;
-            box-shadow: inset 0 0 10px rgba(255,0,0,0.5);
+            border-color: #ff3333;
+            background: #2a0505;
+            color: #ffffff;
         }
 
-        /* OVERLAY DE JUMPSCARE / FRASES */
         #center-jumpscare-overlay {
             display: none;
             position: absolute;
@@ -209,7 +208,8 @@
             .input-code { font-size: 1.5rem; }
             .game-header { font-size: 1rem; }
             #center-jumpscare-overlay { width: 85%; padding: 40px 20px; font-size: 1.4rem; }
-            .matrix-grid { grid-template-columns: repeat(3, 1fr); }
+            .matrix-grid { grid-template-columns: repeat(2, 1fr); }
+            .grid-node { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -244,8 +244,8 @@
             </div>
             
             <p style="color: #ffaa00; font-size: 0.75rem; margin: 0 0 5px 0; text-align: center; line-height: 1.3;">
-                CLIQUE APENAS NO VETOR DESTACADO EM VERMELHO CLARO:<br>
-                <span id="target-word-instruction" style="color:#fff; font-size: 1rem; font-weight:bold; text-transform: uppercase;">AGUARDANDO...</span>
+                CLIQUE APENAS NO VETOR SOLICITADO:<br>
+                <span id="target-word-instruction" style="color:#fff; font-size: 1.1rem; font-weight:bold; background: #500; padding: 2px 10px; display: inline-block; margin-top: 4px; text-transform: uppercase;">AGUARDANDO...</span>
             </p>
 
             <div class="progress-container">
@@ -258,13 +258,14 @@
 
     <script {nonce}>
         let gameInterval = null;
-        let dangerLevel = 0; // Vai de 0 a 100
+        let dangerLevel = 0; 
         let isPausedForMessage = false;
-        let currentCorrectIndex = -1;
+        let currentCorrectWord = "";
 
+        // Palavras parecidas agrupadas estrategicamente para induzir erros de leitura rápida
         const PALAVRAS_HIGIENIZACAO = [
             "FLUSH", "OVERRIDE", "PURGE", "REBOOT", "CLEAR", "BYPASS", "RESET", 
-            "KILL_TASK", "WIPE_RAM", "ISOLATE", "STABILIZE"
+            "KILL_TASK", "WIPE_RAM", "ISOLATE", "STABILIZE", "CLEANED", "OVERLOAD", "REROUTE"
         ];
 
         const FRASES_ERRO_BASE = [
@@ -319,78 +320,74 @@
             document.getElementById("status-line").style.color = "#ff1a1a";
             document.getElementById("status-line").innerText = "ALERTA CATASTRÓFICO - EXCLUSÃO MANUAL REQUERIDA";
             
-            dangerLevel = 15; // Começa com um pouco de perigo
+            dangerLevel = 20; 
             isPausedForMessage = false;
             frasesDisponiveis = [];
             
             atualizarBarraPerigo();
             gerarGridDispositivos();
 
-            // Loop de tempo: A barra de perigo sobe sozinha se o jogador demorar
             clearInterval(gameInterval);
             gameInterval = setInterval(() => {
                 if (!isPausedForMessage) {
-                    dangerLevel += 6; // Velocidade de subida da barra
+                    dangerLevel += 5; // Velocidade de enchimento da barra
                     atualizarBarraPerigo();
                     
                     if (dangerLevel >= 100) {
                         dispararDerrotaTotal();
                     }
                 }
-            }, 500);
+            }, 450);
         }
 
         function atualizarBarraPerigo() {
             document.getElementById("system-danger-bar").style.width = dangerLevel + "%";
         }
 
-        // Gera 4 blocos de botões fáceis de tocar na tela do telefone
         function gerarGridDispositivos() {
             const container = document.getElementById("nodes-container");
             container.innerHTML = "";
 
-            // Escolhe 4 palavras aleatórias da lista de purga
+            // Seleciona 4 palavras aleatórias da lista principal
             let palavrasFase = [];
             while (palavrasFase.length < 4) {
                 let p = PALAVRAS_HIGIENIZACAO[Math.floor(Math.random() * PALAVRAS_HIGIENIZACAO.length)];
                 if (!palavrasFase.includes(p)) palavrasFase.push(p);
             }
 
-            // Define qual delas é a correta da vez
-            currentCorrectIndex = Math.floor(Math.random() * 4);
-            const palavraAlvo = palavrasFase[currentCorrectIndex];
-            document.getElementById("target-word-instruction").innerText = `[ ${palavraAlvo} ]`;
+            // Define estritamente qual palavra deve ser clicada
+            const correctIndex = Math.floor(Math.random() * 4);
+            currentCorrectWord = palavrasFase[correctIndex];
+            document.getElementById("target-word-instruction").innerText = currentCorrectWord;
 
-            // Renderiza os botões
-            palavrasFase.forEach((palavra, index) => {
+            // Renderiza puramente o texto nos botões (limpo, sem hexadecimais de fundo)
+            palavrasFase.forEach((palavra) => {
                 const btn = document.createElement("div");
                 btn.className = "grid-node";
-                if (index === currentCorrectIndex) {
-                    btn.classList.add("target-node"); // Visual levemente destacado
+                
+                if (palavra === currentCorrectWord) {
+                    btn.classList.add("target-node");
                 }
                 
-                // Endereço hexadecimal aleatório para manter o clima hacker
-                const randomHex = Math.floor(Math.random()*256).toString(16).toUpperCase();
-                btn.innerHTML = `<div style="font-size:0.6rem; opacity:0.5; margin-bottom:4px;">0x${randomHex}</div>${palavra}`;
+                btn.innerText = palavra;
                 
-                // Evento de clique/toque
-                btn.onclick = () => processarCliqueNode(index);
+                // Dispara a checagem comparando strings diretas
+                btn.onclick = () => processarCliqueNode(palavra);
                 container.appendChild(btn);
             });
         }
 
-        function processarCliqueNode(indexClicado) {
+        function processarCliqueNode(palavraClicada) {
             if (isPausedForMessage) return;
 
             const mainBox = document.getElementById("main-box");
 
-            if (indexClicado === currentCorrectIndex) {
-                // Acertou! Diminui a barra de perigo e muda os códigos
-                dangerLevel = Math.max(0, dangerLevel - 20);
+            if (palavraClicada === currentCorrectWord) {
+                // Sucesso: Reduz perigo e imediatamente muda posições e palavras
+                dangerLevel = Math.max(0, dangerLevel - 25);
                 atualizarBarraPerigo();
 
                 if (dangerLevel === 0) {
-                    // Ganhou o minijogo, limpa o sistema
                     clearInterval(gameInterval);
                     document.getElementById("center-jumpscare-overlay").style.display = "none";
                     document.getElementById("overflow-minigame").style.display = "none";
@@ -398,12 +395,12 @@
                     document.getElementById("status-line").style.color = "#00ff41";
                     document.getElementById("status-line").innerText = "ZUMBIDO ELÉTRICO ATIVO (60 Hz) --- TELA DE FÓSFORO VERDE ESTÁVEL";
                     document.getElementById("enigma-digits").value = "";
-                    document.getElementById("code-result-message").innerHTML = "<span style='color: #ffb700;'>[SISTEMA PURGADO] Interferência eliminada por toque. Tente a senha novamente.</span>";
+                    document.getElementById("code-result-message").innerHTML = "<span style='color: #ffb700;'>[SISTEMA PURGADO] Interferência eliminada. Tente a senha novamente.</span>";
                 } else {
                     gerarGridDispositivos();
                 }
             } else {
-                // Errou o botão! Penalidade severa na barra e exibe frase assustadora
+                // Erro: Penaliza a barra, treme a tela e congela para exibir a ameaça
                 isPausedForMessage = true;
                 dangerLevel = Math.min(100, dangerLevel + 25);
                 atualizarBarraPerigo();
@@ -425,12 +422,11 @@
                     return;
                 }
 
-                // Pausa de 2.5 segundos para ler a frase assustadora antes de continuar
                 setTimeout(() => {
                     overlay.style.display = "none";
                     isPausedForMessage = false;
-                    gerarGridDispositivos();
-                }, 2500);
+                    gerarGridDispositivos(); // Embaralha tudo de novo após o erro
+                }, 2200);
             }
         }
 
@@ -462,7 +458,6 @@
             document.getElementById("main-box").classList.add("screen-shake");
         }
 
-        // Permite pressionar Enter na caixa do Enigma original
         document.getElementById("enigma-digits").addEventListener("keyup", function(event) {
             if (event.key === "Enter") { testarCodigoEnigma(); }
         });
