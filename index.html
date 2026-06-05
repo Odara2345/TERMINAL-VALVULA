@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>Terminal Matrix CRT - MOBILE POLISHED</title>
+    <title>Terminal Matrix CRT - MOBILE HARDCORE</title>
     <style>
         body {
             background-color: #010201;
@@ -121,6 +121,7 @@
             margin-bottom: 5px;
         }
 
+        /* Todos os nós agora são perfeitamente idênticos, sem qualquer pista visual de luz ou brilho */
         .grid-node {
             background: #150000;
             border: 1px solid #550000;
@@ -133,18 +134,10 @@
             font-weight: bold;
             cursor: pointer;
             text-align: center;
-            padding: 15px 10px;
+            padding: 20px 10px;
             border-radius: 4px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: background 0.1s ease;
-        }
-        
-        /* O alvo correto tem um destaque sutil de cor, mas as palavras parecidas confundem */
-        .grid-node.target-node {
-            border-color: #ff3333;
-            background: #2a0505;
-            color: #ffffff;
         }
 
         #center-jumpscare-overlay {
@@ -262,7 +255,7 @@
         let isPausedForMessage = false;
         let currentCorrectWord = "";
 
-        // Palavras parecidas agrupadas estrategicamente para induzir erros de leitura rápida
+        // Lista otimizada com palavras parecidas para induzir confusão de leitura rápida
         const PALAVRAS_HIGIENIZACAO = [
             "FLUSH", "OVERRIDE", "PURGE", "REBOOT", "CLEAR", "BYPASS", "RESET", 
             "KILL_TASK", "WIPE_RAM", "ISOLATE", "STABILIZE", "CLEANED", "OVERLOAD", "REROUTE"
@@ -330,7 +323,7 @@
             clearInterval(gameInterval);
             gameInterval = setInterval(() => {
                 if (!isPausedForMessage) {
-                    dangerLevel += 5; // Velocidade de enchimento da barra
+                    dangerLevel += 5; 
                     atualizarBarraPerigo();
                     
                     if (dangerLevel >= 100) {
@@ -348,30 +341,22 @@
             const container = document.getElementById("nodes-container");
             container.innerHTML = "";
 
-            // Seleciona 4 palavras aleatórias da lista principal
             let palavrasFase = [];
             while (palavrasFase.length < 4) {
                 let p = PALAVRAS_HIGIENIZACAO[Math.floor(Math.random() * PALAVRAS_HIGIENIZACAO.length)];
                 if (!palavrasFase.includes(p)) palavrasFase.push(p);
             }
 
-            // Define estritamente qual palavra deve ser clicada
             const correctIndex = Math.floor(Math.random() * 4);
             currentCorrectWord = palavrasFase[correctIndex];
             document.getElementById("target-word-instruction").innerText = currentCorrectWord;
 
-            // Renderiza puramente o texto nos botões (limpo, sem hexadecimais de fundo)
+            // Renderiza puramente as strings sem números e sem classes de distinção visual
             palavrasFase.forEach((palavra) => {
                 const btn = document.createElement("div");
                 btn.className = "grid-node";
-                
-                if (palavra === currentCorrectWord) {
-                    btn.classList.add("target-node");
-                }
-                
                 btn.innerText = palavra;
                 
-                // Dispara a checagem comparando strings diretas
                 btn.onclick = () => processarCliqueNode(palavra);
                 container.appendChild(btn);
             });
@@ -383,7 +368,6 @@
             const mainBox = document.getElementById("main-box");
 
             if (palavraClicada === currentCorrectWord) {
-                // Sucesso: Reduz perigo e imediatamente muda posições e palavras
                 dangerLevel = Math.max(0, dangerLevel - 25);
                 atualizarBarraPerigo();
 
@@ -400,7 +384,6 @@
                     gerarGridDispositivos();
                 }
             } else {
-                // Erro: Penaliza a barra, treme a tela e congela para exibir a ameaça
                 isPausedForMessage = true;
                 dangerLevel = Math.min(100, dangerLevel + 25);
                 atualizarBarraPerigo();
@@ -425,7 +408,7 @@
                 setTimeout(() => {
                     overlay.style.display = "none";
                     isPausedForMessage = false;
-                    gerarGridDispositivos(); // Embaralha tudo de novo após o erro
+                    gerarGridDispositivos(); 
                 }, 2200);
             }
         }
