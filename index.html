@@ -2,8 +2,8 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>Terminal Matrix CRT - MOBILE OPTIMIZED</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>Terminal Matrix CRT - FIXED MOBILE</title>
     <style>
         body {
             background-color: #010201;
@@ -14,7 +14,7 @@
             box-sizing: border-box;
             height: 100vh;
             overflow: hidden;
-            -webkit-text-size-adjust: 100%; /* Evita bugs de texto no iOS */
+            -webkit-text-size-adjust: 100%; /* Força o iOS a respeitar o tamanho da fonte */
         }
 
         /* Efeito agressivo de tremor e sangue na interface inteira ao errar */
@@ -28,7 +28,7 @@
             background: #050a05;
             padding: 12px;
             box-shadow: inset 0 0 30px rgba(0,0,0,1);
-            max-width: 500px; /* Otimizado para largura de celular */
+            max-width: 500px;
             margin: 0 auto;
             height: 100%;
             display: flex;
@@ -49,13 +49,14 @@
             font-weight: bold;
         }
 
+        /* Font-size maior que 16px impede o zoom automático do sistema no primeiro input */
         .input-code {
             background: transparent;
             border: 2px solid #00ff41;
             color: #00ff41;
             font-family: 'Courier New', monospace;
             padding: 12px;
-            font-size: 1.5rem;
+            font-size: 22px; 
             width: 100%;
             box-sizing: border-box;
             text-align: center;
@@ -188,7 +189,7 @@
             gap: 6px;
         }
 
-        /* IMPORTANTE: Font-size em 16px impede o zoom automático no Mobile */
+        /* CRÍTICO: Font-size exatamente em 16px neutraliza o zoom forçado do iOS/Android no minijogo */
         .input-overflow {
             flex: 1;
             background: transparent;
@@ -226,11 +227,12 @@
             body { padding: 20px; }
             .terminal-box { height: 90vh; padding: 20px; max-width: 750px; }
             .crt-paper { font-size: 0.95rem; border-left: 12px dotted #a4ad8f; border-right: 12px dotted #a4ad8f; }
-            .input-code { letter-spacing: 10px; }
+            .input-code { letter-spacing: 10px; font-size: 1.5rem; }
             .game-header { font-size: 1rem; letter-spacing: 2px; }
             #memory-stack { font-size: 0.9rem; padding: 10px; }
             #center-jumpscare-overlay { width: 85%; padding: 40px 20px; font-size: 1.4rem; }
             .btn-overflow { padding: 10px 20px; font-size: 1rem; }
+            .input-overflow { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -389,12 +391,11 @@
             currentLines.push(fakeMemory);
             renderizarPilha();
 
-            // CONDIÇÃO DE DERROTA OPERACIONAL
             if (currentLines.length > MAX_LINES) {
                 clearInterval(gameInterval);
                 clearTimeout(overlayTimeout);
                 
-                isPausedForMessage = true; // Pausa permanentemente até reiniciar
+                isPausedForMessage = true; 
 
                 const overlay = document.getElementById("center-jumpscare-overlay");
                 overlay.style.display = "block";
