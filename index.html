@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>Terminal Matrix CRT - FIXED MOBILE</title>
+    <title>Terminal Matrix CRT - MOBILE PERFECT</title>
     <style>
         body {
             background-color: #010201;
@@ -14,10 +14,10 @@
             box-sizing: border-box;
             height: 100vh;
             overflow: hidden;
-            -webkit-text-size-adjust: 100%; /* Força o iOS a respeitar o tamanho da fonte */
+            -webkit-text-size-adjust: 100%;
+            user-select: none;
         }
 
-        /* Efeito agressivo de tremor e sangue na interface inteira ao errar */
         .screen-shake {
             animation: hardShake 0.15s cubic-bezier(.36,.07,.19,.97) both infinite;
             background-color: #2b0000 !important;
@@ -49,7 +49,6 @@
             font-weight: bold;
         }
 
-        /* Font-size maior que 16px impede o zoom automático do sistema no primeiro input */
         .input-code {
             background: transparent;
             border: 2px solid #00ff41;
@@ -77,8 +76,8 @@
             text-transform: uppercase;
             font-size: 0.95rem;
         }
-        .btn-send:hover { background: #ffffff; }
 
+        /* --- NOVO DESIGN DO MINIGAME MOBILE (SEM TECLADO) --- */
         #overflow-minigame {
             display: none;
             flex-direction: column;
@@ -98,33 +97,57 @@
             border-bottom: 1px solid #ff1a1a;
             padding-bottom: 5px;
             margin-bottom: 8px;
-            letter-spacing: 1px;
             font-size: 0.75rem;
         }
 
-        #memory-stack {
+        /* Barra de perigo/estabilidade */
+        .progress-container {
+            background: #220000;
+            border: 1px solid #ff1a1a;
+            height: 20px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .progress-bar {
+            background: #ff1a1a;
+            width: 0%;
+            height: 100%;
+            transition: width 0.2s linear;
+        }
+
+        /* Grid de botões para clicar no celular */
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
             flex: 1;
-            background: #000;
-            border: 1px solid #220000;
-            padding: 6px;
-            font-size: 0.8rem;
-            color: #ff4444;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            overflow: hidden;
-            line-height: 1.3;
             margin-bottom: 5px;
         }
 
-        .memory-line {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            opacity: 0.6;
+        .grid-node {
+            background: #150000;
+            border: 1px solid #550000;
+            color: #ff4444;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            padding: 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .grid-node.target-node {
+            border-color: #ff1a1a;
+            background: #3a0000;
+            color: #fff;
+            box-shadow: inset 0 0 10px rgba(255,0,0,0.5);
         }
 
-        /* CAIXA DE TEXTO RIGIDAMENTE CENTRALIZADA NO MEIO EXATO DO TERMINAL */
+        /* OVERLAY DE JUMPSCARE / FRASES */
         #center-jumpscare-overlay {
             display: none;
             position: absolute;
@@ -147,7 +170,6 @@
             text-transform: uppercase;
         }
 
-        /* ANIMAÇÃO PISCANTE PARA O ERRO COMPLETO (DERROTA) */
         .fatal-blink {
             animation: redWhiteBlink 0.2s infinite alternate;
         }
@@ -165,9 +187,6 @@
             text-transform: uppercase;
             box-shadow: 0 0 15px rgba(255, 26, 26, 0.6);
         }
-        .btn-restart-game:hover {
-            background: #ffffff;
-        }
 
         @keyframes redWhiteBlink {
             from { color: #ff0000; text-shadow: 0 0 20px #f00; }
@@ -183,56 +202,14 @@
             100% { transform: translate(2px, 3px) rotate(-1deg); }
         }
 
-        .input-area-overflow {
-            margin-top: 5px;
-            display: flex;
-            gap: 6px;
-        }
-
-        /* CRÍTICO: Font-size exatamente em 16px neutraliza o zoom forçado do iOS/Android no minijogo */
-        .input-overflow {
-            flex: 1;
-            background: transparent;
-            border: 1px solid #ff1a1a;
-            color: #ff1a1a;
-            padding: 12px;
-            font-family: 'Courier New', monospace;
-            font-size: 16px; 
-            outline: none;
-            min-width: 0;
-        }
-        .input-overflow:disabled {
-            background: #1a0000;
-            border-color: #550000;
-            color: #550000;
-        }
-
-        .btn-overflow {
-            background: #ff1a1a;
-            color: #000;
-            border: none;
-            padding: 12px 14px;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-        .btn-overflow:disabled {
-            background: #440000;
-            color: #220000;
-            cursor: not-allowed;
-        }
-
         @media (min-width: 768px) {
             body { padding: 20px; }
             .terminal-box { height: 90vh; padding: 20px; max-width: 750px; }
-            .crt-paper { font-size: 0.95rem; border-left: 12px dotted #a4ad8f; border-right: 12px dotted #a4ad8f; }
-            .input-code { letter-spacing: 10px; font-size: 1.5rem; }
-            .game-header { font-size: 1rem; letter-spacing: 2px; }
-            #memory-stack { font-size: 0.9rem; padding: 10px; }
+            .crt-paper { font-size: 0.95rem; }
+            .input-code { font-size: 1.5rem; }
+            .game-header { font-size: 1rem; }
             #center-jumpscare-overlay { width: 85%; padding: 40px 20px; font-size: 1.4rem; }
-            .btn-overflow { padding: 10px 20px; font-size: 1rem; }
-            .input-overflow { font-size: 1.1rem; }
+            .matrix-grid { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
 </head>
@@ -263,30 +240,27 @@
 
         <div id="overflow-minigame">
             <div class="game-header">
-                [ALERTA DE SISTEMA] COMPROMETIMENTO AGUDO DAS SUBTRILHAS DE SINAL
+                [SISTEMA CORROMPIDO] PURGUE OS VETORES INVASORES IMEDIATAMENTE
             </div>
             
-            <p style="color: #ffaa00; font-size: 0.75rem; margin: 0 0 8px 0; text-align: center; line-height: 1.3;">
-                DIGITE A PALAVRA COAGULANTE PARA RETER O VAZAMENTO: <br>
-                <span id="target-word-display" style="color:#fff; font-size: 1.1rem; font-weight:bold; background: #500; padding: 2px 10px; display: inline-block; margin-top: 4px;">FLUSH</span>
+            <p style="color: #ffaa00; font-size: 0.75rem; margin: 0 0 5px 0; text-align: center; line-height: 1.3;">
+                CLIQUE APENAS NO VETOR DESTACADO EM VERMELHO CLARO:<br>
+                <span id="target-word-instruction" style="color:#fff; font-size: 1rem; font-weight:bold; text-transform: uppercase;">AGUARDANDO...</span>
             </p>
 
-            <div id="memory-stack"></div>
-
-            <div class="input-area-overflow">
-                <input type="text" id="overflow-input" class="input-overflow" placeholder="Digite o comando..." autocomplete="off" autocapitalize="characters">
-                <button id="overflow-btn" class="btn-overflow" onclick="processarComandoOverflow()">Executar</button>
+            <div class="progress-container">
+                <div id="system-danger-bar" class="progress-bar"></div>
             </div>
+
+            <div id="nodes-container" class="matrix-grid"></div>
         </div>
     </div>
 
     <script {nonce}>
         let gameInterval = null;
-        let overlayTimeout = null;
-        let isPausedForMessage = false; 
-        const MAX_LINES = 15; 
-        let currentLines = []; 
-        let currentTargetWord = "FLUSH";
+        let dangerLevel = 0; // Vai de 0 a 100
+        let isPausedForMessage = false;
+        let currentCorrectIndex = -1;
 
         const PALAVRAS_HIGIENIZACAO = [
             "FLUSH", "OVERRIDE", "PURGE", "REBOOT", "CLEAR", "BYPASS", "RESET", 
@@ -335,177 +309,162 @@
             if (codeTyped === "4213") {
                 resultMsg.innerHTML = "<span style='color: #00ff41;'>[ACESSO CONCEDIDO] Matriz sincronizada. Eclusa destrancada!</span>";
             } else {
-                iniciarBufferOverflow();
+                iniciarMinigameMobile();
             }
         }
 
-        function iniciarBufferOverflow() {
+        function iniciarMinigameMobile() {
             document.getElementById("code-entry-zone").style.display = "none";
             document.getElementById("overflow-minigame").style.display = "flex";
             document.getElementById("status-line").style.color = "#ff1a1a";
-            document.getElementById("status-line").innerText = "SISTEMA SEQUESTRADO - INTEGRALIDADE DO HARDWARE EM RISCO";
+            document.getElementById("status-line").innerText = "ALERTA CATASTRÓFICO - EXCLUSÃO MANUAL REQUERIDA";
             
-            currentLines = [];
+            dangerLevel = 15; // Começa com um pouco de perigo
             isPausedForMessage = false;
-            frasesDisponiveis = []; 
+            frasesDisponiveis = [];
             
-            document.getElementById("overflow-input").disabled = false;
-            document.getElementById("overflow-btn").disabled = false;
+            atualizarBarraPerigo();
+            gerarGridDispositivos();
 
-            document.getElementById("memory-stack").innerHTML = "";
-            document.getElementById("overflow-input").value = "";
-            document.getElementById("overflow-input").focus();
-            
-            const overlay = document.getElementById("center-jumpscare-overlay");
-            overlay.style.display = "none";
-            overlay.classList.remove("fatal-blink");
-
-            definirNovaPalavraAleatoria();
-            resetarTemporizadorLixo();
-            adicionarLinhaLixo();
-        }
-
-        function resetarTemporizadorLixo() {
+            // Loop de tempo: A barra de perigo sobe sozinha se o jogador demorar
             clearInterval(gameInterval);
-            if (!isPausedForMessage) {
-                gameInterval = setInterval(() => {
-                    adicionarLinhaLixo();
-                }, 850);
-            }
-        }
-
-        function definirNovaPalavraAleatoria() {
-            const idx = Math.floor(Math.random() * PALAVRAS_HIGIENIZACAO.length);
-            currentTargetWord = PALAVRAS_HIGIENIZACAO[idx];
-            document.getElementById("target-word-display").innerText = currentTargetWord;
-        }
-
-        function adicionarLinhaLixo() {
-            if (isPausedForMessage) return; 
-
-            const stack = document.getElementById("memory-stack");
-            const randomHex = () => Math.floor(Math.random()*16).toString(16).toUpperCase();
-            
-            const fakeMemory = `0x00A${randomHex()} [SYSTEM_INFECTED] => OVERFLOW_${randomHex()}${randomHex()}`;
-            
-            currentLines.push(fakeMemory);
-            renderizarPilha();
-
-            if (currentLines.length > MAX_LINES) {
-                clearInterval(gameInterval);
-                clearTimeout(overlayTimeout);
-                
-                isPausedForMessage = true; 
-
-                const overlay = document.getElementById("center-jumpscare-overlay");
-                overlay.style.display = "block";
-                overlay.style.width = "100%";
-                overlay.style.height = "100%";
-                overlay.style.background = "#140000";
-                overlay.style.border = "none";
-                
-                overlay.innerHTML = `
-                    <div class="fatal-blink" style='margin-top: 40%; font-size: 1.2rem; letter-spacing: 1px; font-weight: 900; padding: 0 15px;'>
-                        [CRÍTICO: VOCÊ MATOU TODOS ELES...]<br><br>
-                        " ELE ESTÁ VINDO, COMECE A REZAR. "
-                        <br>
-                        <button class="btn-restart-game" onclick="window.location.reload();">REINICIAR TERMINAL</button>
-                    </div>
-                `;
-
-                if (window.innerWidth >= 768) {
-                    overlay.querySelector('.fatal-blink').style.marginTop = "25%";
-                    overlay.querySelector('.fatal-blink').style.fontSize = "1.7rem";
+            gameInterval = setInterval(() => {
+                if (!isPausedForMessage) {
+                    dangerLevel += 6; // Velocidade de subida da barra
+                    atualizarBarraPerigo();
+                    
+                    if (dangerLevel >= 100) {
+                        dispararDerrotaTotal();
+                    }
                 }
+            }, 500);
+        }
 
-                document.getElementById("main-box").classList.add("screen-shake");
+        function atualizarBarraPerigo() {
+            document.getElementById("system-danger-bar").style.width = dangerLevel + "%";
+        }
+
+        // Gera 4 blocos de botões fáceis de tocar na tela do telefone
+        function gerarGridDispositivos() {
+            const container = document.getElementById("nodes-container");
+            container.innerHTML = "";
+
+            // Escolhe 4 palavras aleatórias da lista de purga
+            let palavrasFase = [];
+            while (palavrasFase.length < 4) {
+                let p = PALAVRAS_HIGIENIZACAO[Math.floor(Math.random() * PALAVRAS_HIGIENIZACAO.length)];
+                if (!palavrasFase.includes(p)) palavrasFase.push(p);
             }
+
+            // Define qual delas é a correta da vez
+            currentCorrectIndex = Math.floor(Math.random() * 4);
+            const palavraAlvo = palavrasFase[currentCorrectIndex];
+            document.getElementById("target-word-instruction").innerText = `[ ${palavraAlvo} ]`;
+
+            // Renderiza os botões
+            palavrasFase.forEach((palavra, index) => {
+                const btn = document.createElement("div");
+                btn.className = "grid-node";
+                if (index === currentCorrectIndex) {
+                    btn.classList.add("target-node"); // Visual levemente destacado
+                }
+                
+                // Endereço hexadecimal aleatório para manter o clima hacker
+                const randomHex = Math.floor(Math.random()*256).toString(16).toUpperCase();
+                btn.innerHTML = `<div style="font-size:0.6rem; opacity:0.5; margin-bottom:4px;">0x${randomHex}</div>${palavra}`;
+                
+                // Evento de clique/toque
+                btn.onclick = () => processarCliqueNode(index);
+                container.appendChild(btn);
+            });
         }
 
-        function renderizarPilha() {
-            const stack = document.getElementById("memory-stack");
-            stack.innerHTML = currentLines.map(line => `<div class="memory-line">${line}</div>`).join("");
-        }
+        function processarCliqueNode(indexClicado) {
+            if (isPausedForMessage) return;
 
-        function processarComandoOverflow() {
-            if (isPausedForMessage) return; 
-
-            const inputEl = document.getElementById("overflow-input");
-            const btnEl = document.getElementById("overflow-btn");
-            const comandoDigitado = inputEl.value.trim().toUpperCase();
             const mainBox = document.getElementById("main-box");
 
-            if (comandoDigitado === currentTargetWord) {
-                if (currentLines.length > 0) {
-                    currentLines.splice(0, 3); 
-                    renderizarPilha();
-                }
-                definirNovaPalavraAleatoria();
+            if (indexClicado === currentCorrectIndex) {
+                // Acertou! Diminui a barra de perigo e muda os códigos
+                dangerLevel = Math.max(0, dangerLevel - 20);
+                atualizarBarraPerigo();
 
-                if (currentLines.length === 0) {
+                if (dangerLevel === 0) {
+                    // Ganhou o minijogo, limpa o sistema
                     clearInterval(gameInterval);
-                    clearTimeout(overlayTimeout);
                     document.getElementById("center-jumpscare-overlay").style.display = "none";
                     document.getElementById("overflow-minigame").style.display = "none";
                     document.getElementById("code-entry-zone").style.display = "block";
                     document.getElementById("status-line").style.color = "#00ff41";
                     document.getElementById("status-line").innerText = "ZUMBIDO ELÉTRICO ATIVO (60 Hz) --- TELA DE FÓSFORO VERDE ESTÁVEL";
                     document.getElementById("enigma-digits").value = "";
-                    document.getElementById("code-result-message").innerHTML = "<span style='color: #ffb700;'>[SISTEMA LIMPO] Conexão purgada com sucesso. Tente reinjetar o código.</span>";
+                    document.getElementById("code-result-message").innerHTML = "<span style='color: #ffb700;'>[SISTEMA PURGADO] Interferência eliminada por toque. Tente a senha novamente.</span>";
+                } else {
+                    gerarGridDispositivos();
                 }
             } else {
-                clearTimeout(overlayTimeout);
-
+                // Errou o botão! Penalidade severa na barra e exibe frase assustadora
                 isPausedForMessage = true;
-                inputEl.disabled = true;
-                btnEl.disabled = true;
-                clearInterval(gameInterval); 
+                dangerLevel = Math.min(100, dangerLevel + 25);
+                atualizarBarraPerigo();
 
                 mainBox.classList.add("screen-shake");
-                setTimeout(() => {
-                    mainBox.classList.remove("screen-shake");
-                }, 300);
+                setTimeout(() => mainBox.classList.remove("screen-shake"), 300);
 
                 const fraseEscolhida = obterFraseSemRepetir();
-
                 const overlay = document.getElementById("center-jumpscare-overlay");
+                
                 overlay.innerHTML = `
-                    <span style="color:#ff1a1a; font-size: 0.8rem; letter-spacing: 2px; display:block; margin-bottom:10px;">[ERRO DE INJEÇÃO FATAL]</span>
+                    <span style="color:#ff1a1a; font-size: 0.8rem; letter-spacing: 2px; display:block; margin-bottom:10px;">[VETOR DE SEGURANÇA VIOLADO]</span>
                     "${fraseEscolhida}"
                 `;
                 overlay.style.display = "block";
 
-                const randomHex = () => Math.floor(Math.random()*16).toString(16).toUpperCase();
-                currentLines.push(`0x00F${randomHex()} [ENTITY_FEEDBACK] => ERR`);
-                renderizarPilha();
+                if (dangerLevel >= 100) {
+                    dispararDerrotaTotal();
+                    return;
+                }
 
-                overlayTimeout = setTimeout(() => {
-                    if (currentLines.length <= MAX_LINES) {
-                        overlay.style.display = "none";
-                        isPausedForMessage = false; 
-                        
-                        inputEl.disabled = false;
-                        btnEl.disabled = false;
-                        inputEl.value = "";
-                        inputEl.focus();
-                        
-                        resetarTemporizadorLixo(); 
-                    } else {
-                        isPausedForMessage = false;
-                        adicionarLinhaLixo();
-                    }
-                }, 3000);
-            }
-            if (!isPausedForMessage) {
-                inputEl.value = "";
+                // Pausa de 2.5 segundos para ler a frase assustadora antes de continuar
+                setTimeout(() => {
+                    overlay.style.display = "none";
+                    isPausedForMessage = false;
+                    gerarGridDispositivos();
+                }, 2500);
             }
         }
 
+        function dispararDerrotaTotal() {
+            clearInterval(gameInterval);
+            isPausedForMessage = true;
+
+            const overlay = document.getElementById("center-jumpscare-overlay");
+            overlay.style.display = "block";
+            overlay.style.width = "100%";
+            overlay.style.height = "100%";
+            overlay.style.background = "#140000";
+            overlay.style.border = "none";
+            
+            overlay.innerHTML = `
+                <div class="fatal-blink" style='margin-top: 40%; font-size: 1.2rem; letter-spacing: 1px; font-weight: 900; padding: 0 15px;'>
+                    [CRÍTICO: VOCÊ MATOU TODOS ELES...]<br><br>
+                    " ELE ESTÁ VINDO, COMECE A REZAR. "
+                    <br>
+                    <button class="btn-restart-game" onclick="window.location.reload();">REINICIAR TERMINAL</button>
+                </div>
+            `;
+
+            if (window.innerWidth >= 768) {
+                overlay.querySelector('.fatal-blink').style.marginTop = "25%";
+                overlay.querySelector('.fatal-blink').style.fontSize = "1.7rem";
+            }
+
+            document.getElementById("main-box").classList.add("screen-shake");
+        }
+
+        // Permite pressionar Enter na caixa do Enigma original
         document.getElementById("enigma-digits").addEventListener("keyup", function(event) {
             if (event.key === "Enter") { testarCodigoEnigma(); }
-        });
-        document.getElementById("overflow-input").addEventListener("keyup", function(event) {
-            if (event.key === "Enter") { processarComandoOverflow(); }
         });
     </script>
 </body>
