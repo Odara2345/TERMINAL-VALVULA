@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>Terminal Matrix CRT - MOBILE HARDCORE</title>
+    <title>Terminal Matrix CRT - PSYCHO EDITION</title>
     <style>
         body {
             background-color: #010201;
@@ -110,7 +110,7 @@
             background: #ff1a1a;
             width: 0%;
             height: 100%;
-            transition: width 0.2s linear;
+            transition: width 0.15s linear;
         }
 
         .matrix-grid {
@@ -121,7 +121,6 @@
             margin-bottom: 5px;
         }
 
-        /* Todos os nós agora são perfeitamente idênticos, sem qualquer pista visual de luz ou brilho */
         .grid-node {
             background: #150000;
             border: 1px solid #550000;
@@ -241,6 +240,10 @@
                 <span id="target-word-instruction" style="color:#fff; font-size: 1.1rem; font-weight:bold; background: #500; padding: 2px 10px; display: inline-block; margin-top: 4px; text-transform: uppercase;">AGUARDANDO...</span>
             </p>
 
+            <div id="score-counter" style="color: #ff4444; font-size: 0.8rem; text-align: center; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px;">
+                CONEXÕES PURGADAS: 0 / 5
+            </div>
+
             <div class="progress-container">
                 <div id="system-danger-bar" class="progress-bar"></div>
             </div>
@@ -254,8 +257,11 @@
         let dangerLevel = 0; 
         let isPausedForMessage = false;
         let currentCorrectWord = "";
+        
+        let successfulClicks = 0; // Contador de acertos atuais
+        const REQUIRED_CLICKS = 5; // Quantidade mínima de acertos para ganhar
+        let baseSpeed = 450; // Velocidade inicial do loop em milisegundos
 
-        // Lista otimizada com palavras parecidas para induzir confusão de leitura rápida
         const PALAVRAS_HIGIENIZACAO = [
             "FLUSH", "OVERRIDE", "PURGE", "REBOOT", "CLEAR", "BYPASS", "RESET", 
             "KILL_TASK", "WIPE_RAM", "ISOLATE", "STABILIZE", "CLEANED", "OVERLOAD", "REROUTE"
@@ -284,16 +290,36 @@
             " Algo acabou de tocar a sua nuca. "
         ];
 
-        let frasesDisponiveis = [];
+        const FRASES_ACERTO_BASE = [
+            " Você acha que está ganhando tempo? ",
+            " Ele está gostando de ver você tentar. ",
+            " Cada acerto apenas atrasa o inevitável. ",
+            " Continue clicando. O barulho ajuda ele a te achar. ",
+            " Seus amigos ainda estão trancados lá fora. ",
+            " Algo se moveu embaixo da sua mesa agora. ",
+            " O terminal está registrando seu medo. ",
+            " Não comemore. A velocidade mudou. ",
+            " Você realmente acha que há uma saída? ",
+            " O oxigênio da sala continua caindo. "
+        ];
 
-        function obterFraseSemRepetir() {
-            if (frasesDisponiveis.length === 0) {
-                frasesDisponiveis = [...FRASES_ERRO_BASE];
-            }
-            const index = Math.floor(Math.random() * frasesDisponiveis.length);
-            const fraseEscolhida = frasesDisponiveis[index];
-            frasesDisponiveis.splice(index, 1);
-            return fraseEscolhida.toUpperCase();
+        let frasesErroDisponiveis = [];
+        let frasesAcertoDisponiveis = [];
+
+        function obterFraseErro() {
+            if (frasesErroDisponiveis.length === 0) frasesErroDisponiveis = [...FRASES_ERRO_BASE];
+            const index = Math.floor(Math.random() * frasesErroDisponiveis.length);
+            const frase = frasesErroDisponiveis[index];
+            frasesErroDisponiveis.splice(index, 1);
+            return frase.toUpperCase();
+        }
+
+        function obterFraseAcerto() {
+            if (frasesAcertoDisponiveis.length === 0) frasesAcertoDisponiveis = [...FRASES_ACERTO_BASE];
+            const index = Math.floor(Math.random() * frasesAcertoDisponiveis.length);
+            const frase = frasesAcertoDisponiveis[index];
+            frasesAcertoDisponiveis.splice(index, 1);
+            return frase.toUpperCase();
         }
 
         function testarCodigoEnigma() {
@@ -314,27 +340,38 @@
             document.getElementById("status-line").innerText = "ALERTA CATASTRÓFICO - EXCLUSÃO MANUAL REQUERIDA";
             
             dangerLevel = 20; 
+            successfulClicks = 0;
+            baseSpeed = 450; // Reseta a velocidade inicial
             isPausedForMessage = false;
-            frasesDisponiveis = [];
+            frasesErroDisponiveis = [];
+            frasesAcertoDisponiveis = [];
             
             atualizarBarraPerigo();
+            atualizarContadorAcertos();
             gerarGridDispositivos();
+            configurarLoopProgresso();
+        }
 
+        function configurarLoopProgresso() {
             clearInterval(gameInterval);
             gameInterval = setInterval(() => {
                 if (!isPausedForMessage) {
-                    dangerLevel += 5; 
+                    dangerLevel += 4; // Incremento estável da barra
                     atualizarBarraPerigo();
                     
                     if (dangerLevel >= 100) {
                         dispararDerrotaTotal();
                     }
                 }
-            }, 450);
+            }, baseSpeed);
         }
 
         function atualizarBarraPerigo() {
             document.getElementById("system-danger-bar").style.width = dangerLevel + "%";
+        }
+
+        function atualizarContadorAcertos() {
+            document.getElementById("score-counter").innerText = `CONEXÕES PURGADAS: ${successfulClicks} / ${REQUIRED_CLICKS}`;
         }
 
         function gerarGridDispositivos() {
@@ -351,12 +388,10 @@
             currentCorrectWord = palavrasFase[correctIndex];
             document.getElementById("target-word-instruction").innerText = currentCorrectWord;
 
-            // Renderiza puramente as strings sem números e sem classes de distinção visual
             palavrasFase.forEach((palavra) => {
                 const btn = document.createElement("div");
                 btn.className = "grid-node";
                 btn.innerText = palavra;
-                
                 btn.onclick = () => processarCliqueNode(palavra);
                 container.appendChild(btn);
             });
@@ -366,24 +401,50 @@
             if (isPausedForMessage) return;
 
             const mainBox = document.getElementById("main-box");
+            const overlay = document.getElementById("center-jumpscare-overlay");
 
             if (palavraClicada === currentCorrectWord) {
-                dangerLevel = Math.max(0, dangerLevel - 25);
+                // ACERTOU: Incrementa progresso, diminui um pouco o perigo e aumenta a velocidade do jogo
+                successfulClicks++;
+                dangerLevel = Math.max(0, dangerLevel - 15);
+                baseSpeed = Math.max(150, baseSpeed - 65); // Reduz o intervalo do loop (fica mais rápido)
+                
                 atualizarBarraPerigo();
+                atualizarContadorAcertos();
 
-                if (dangerLevel === 0) {
+                if (successfulClicks >= REQUIRED_CLICKS) {
+                    // Clicou o número mínimo e ganhou o minijogo
                     clearInterval(gameInterval);
-                    document.getElementById("center-jumpscare-overlay").style.display = "none";
+                    overlay.style.display = "none";
                     document.getElementById("overflow-minigame").style.display = "none";
                     document.getElementById("code-entry-zone").style.display = "block";
                     document.getElementById("status-line").style.color = "#00ff41";
                     document.getElementById("status-line").innerText = "ZUMBIDO ELÉTRICO ATIVO (60 Hz) --- TELA DE FÓSFORO VERDE ESTÁVEL";
                     document.getElementById("enigma-digits").value = "";
-                    document.getElementById("code-result-message").innerHTML = "<span style='color: #ffb700;'>[SISTEMA PURGADO] Interferência eliminada. Tente a senha novamente.</span>";
-                } else {
-                    gerarGridDispositivos();
+                    document.getElementById("code-result-message").innerHTML = "<span style='color: #00ff41;'>[PURGA COMPLETA] Estabilidade provisória alcançada. Redija a senha.</span>";
+                    return;
                 }
+
+                // TRAVA A TELA DO USUÁRIO MESMO EM CASO DE ACERTO (Pressão psicológica)
+                isPausedForMessage = true;
+                const fraseAcerto = obterFraseAcerto();
+                
+                overlay.innerHTML = `
+                    <span style="color:#ffb700; font-size: 0.8rem; letter-spacing: 2px; display:block; margin-bottom:10px;">[SINAL BUFFERIZADO SUCESSO]</span>
+                    "${fraseAcerto}"
+                `;
+                overlay.style.display = "block";
+
+                // Pausa menor para acertos (1.2 segundos) para dar tempo de reagir à velocidade nova
+                setTimeout(() => {
+                    overlay.style.display = "none";
+                    isPausedForMessage = false;
+                    gerarGridDispositivos();
+                    configurarLoopProgresso(); // Aplica a nova velocidade acelerada
+                }, 1200);
+
             } else {
+                // ERROU: Penalidade de barra, treme a tela e exibe ameaça vermelha agressiva
                 isPausedForMessage = true;
                 dangerLevel = Math.min(100, dangerLevel + 25);
                 atualizarBarraPerigo();
@@ -391,24 +452,24 @@
                 mainBox.classList.add("screen-shake");
                 setTimeout(() => mainBox.classList.remove("screen-shake"), 300);
 
-                const fraseEscolhida = obterFraseSemRepetir();
-                const overlay = document.getElementById("center-jumpscare-overlay");
-                
-                overlay.innerHTML = `
-                    <span style="color:#ff1a1a; font-size: 0.8rem; letter-spacing: 2px; display:block; margin-bottom:10px;">[VETOR DE SEGURANÇA VIOLADO]</span>
-                    "${fraseEscolhida}"
-                `;
-                overlay.style.display = "block";
-
                 if (dangerLevel >= 100) {
                     dispararDerrotaTotal();
                     return;
                 }
 
+                const fraseErro = obterFraseErro();
+                overlay.innerHTML = `
+                    <span style="color:#ff1a1a; font-size: 0.8rem; letter-spacing: 2px; display:block; margin-bottom:10px;">[VETOR DE SEGURANÇA VIOLADO]</span>
+                    "${fraseErro}"
+                `;
+                overlay.style.display = "block";
+
+                // Pausa maior para erros (2.2 segundos) punindo severamente o tempo do jogador
                 setTimeout(() => {
                     overlay.style.display = "none";
                     isPausedForMessage = false;
-                    gerarGridDispositivos(); 
+                    gerarGridDispositivos();
+                    configurarLoopProgresso();
                 }, 2200);
             }
         }
